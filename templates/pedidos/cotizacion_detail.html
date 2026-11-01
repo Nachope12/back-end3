@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block title %}Cotización #{{ object.pk }}{% endblock %}
+{% block content %}
+<header class="cabecera">
+  <h1>Cotización #{{ object.pk }} <span class="badge badge-{{ object.estado }}">{{ object.get_estado_display }}</span></h1>
+  <div class="botones">
+    {% if object.es_editable %}
+      <a class="btn btn-secundario" href="{% url 'cotizacion_update' object.pk %}">Editar</a>
+      <form method="post" action="{% url 'cotizacion_rechazar' object.pk %}" data-confirmar="¿Rechazar esta cotización?">{% csrf_token %}<button class="btn btn-secundario">Rechazar</button></form>
+      <form method="post" action="{% url 'cotizacion_aprobar' object.pk %}">{% csrf_token %}<button class="btn btn-primario">Aprobar y crear pedido</button></form>
+    {% elif object.pedido %}
+      <a class="btn btn-primario" href="{% url 'pedido_detail' object.pedido.pk %}">Ver pedido #{{ object.pedido.pk }}</a>
+    {% endif %}
+    <a class="btn btn-secundario" href="{% url 'cotizacion_list' %}">Volver</a>
+  </div>
+</header>
+
+<div class="rejilla dos">
+  <section class="tarjeta">
+    <h2>Solicitud</h2>
+    <dl class="datos">
+      <dt>Cliente</dt><dd>{{ object.cliente }}</dd>
+      <dt>Entrega</dt><dd>{{ object.fecha_entrega|date:"l d/m/Y H:i" }}</dd>
+      <dt>Diseño</dt><dd>{{ object.diseno|linebreaksbr }}</dd>
+    </dl>
+  </section>
+  <section class="tarjeta">
+    <h2>Productos cotizados</h2>
+    <table class="tabla compacta">
+      <thead><tr><th>Producto</th><th>Cant.</th><th>Precio</th><th>Subtotal</th></tr></thead>
+      <tbody>{% for i in object.items.all %}<tr><td>{{ i.producto }}</td><td>{{ i.cantidad }}</td><td>{{ i.precio_unitario|clp }}</td><td>{{ i.subtotal|clp }}</td></tr>{% endfor %}</tbody>
+      <tfoot><tr><th colspan="3">Total</th><th>{{ object.total|clp }}</th></tr></tfoot>
+    </table>
+  </section>
+</div>
+
+<section class="tarjeta">
+  <h2>¿Hay insumos para producir esto?</h2>
+  <p class="suave">Disponibilidad actual en bodega frente a lo que pide la cotización.</p>
+  <table class="tabla compacta">
+    <thead><tr><th>Insumo</th><th>Necesario</th><th>En bodega</th><th>Estado</th></tr></thead>
+    <tbody>
+    {% for f in requerimiento %}
+      <tr><td>{{ f.insumo.nombre }}</td><td>{{ f.necesario|num }} {{ f.insumo.unidad }}</td><td>{{ f.stock|num }} {{ f.insumo.unidad }}</td>
+        <td>{% if f.falta > 0 %}<span class="badge badge-BAJO">Faltan {{ f.falta|num }} {{ f.insumo.unidad }}</span>{% else %}<span class="badge badge-OK">Suficiente</span>{% endif %}</td></tr>
+    {% empty %}<tr><td colspan="4" class="suave">Sin lista de materiales.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

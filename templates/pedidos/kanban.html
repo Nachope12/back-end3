@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Tablero de cocina{% endblock %}
+{% block content %}
+<header class="cabecera">
+  <h1>Tablero de cocina</h1>
+  <p class="suave">{% if puede_mover %}Arrastra una tarjeta a la columna siguiente o usa los botones.{% else %}Vista de solo lectura.{% endif %}</p>
+</header>
+
+<div class="tablero" data-api="{% url 'pedido-list' %}" data-mover="{% if puede_mover %}1{% else %}0{% endif %}">
+  {% for col in columnas %}
+  <section class="columna col-{{ col.codigo }}" data-estado="{{ col.codigo }}" aria-label="{{ col.nombre }}">
+    <h2>{{ col.nombre }} <span class="conteo">{{ col.cantidad }}</span></h2>
+    <div class="tarjetas">
+      {% for p in col.pedidos %}
+      <article class="tarjeta-pedido {% if p.urgente %}urgente{% endif %}" data-id="{{ p.pk }}" data-estado="{{ p.estado }}"
+               {% if puede_mover %}draggable="true"{% endif %}>
+        <a class="titulo" href="{% url 'pedido_detail' p.pk %}">#{{ p.pk }} · {{ p.cliente }}</a>
+        <p class="resumen">{{ p.resumen_productos }}</p>
+        <p class="entrega">Entrega {{ p.fecha_entrega|date:"D d/m H:i" }}{% if p.urgente %} · <b>urgente</b>{% endif %}</p>
+        {% if puede_mover %}
+        <div class="mover">
+          {% if p.estado == "CONTROL_CALIDAD" %}<button class="btn-mini" data-a="HORNEADO_DECORADO">Devolver a horneado</button>{% endif %}
+          {% if p.siguiente_estado %}<button class="btn-mini btn-mini-primario" data-a="{{ p.siguiente_estado }}">Pasar a {{ p.siguiente_etiqueta }}</button>{% endif %}
+        </div>
+        {% endif %}
+      </article>
+      {% empty %}<p class="suave vacio-col">Sin pedidos</p>{% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}{% load static %}<script src="{% static 'js/kanban.js' %}"></script>{% endblock %}

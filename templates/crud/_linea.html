@@ -1,0 +1,9 @@
+<div class="linea">
+  {% for h in f.hidden_fields %}{{ h }}{% endfor %}
+  {% for campo in f.visible_fields %}
+    {% if campo.name == "DELETE" %}
+      <label class="quitar"><span>Quitar</span> {{ campo }}</label>
+    {% else %}{% include "crud/_campo.html" %}{% endif %}
+  {% endfor %}
+  {% if f.non_field_errors %}<small class="error">{{ f.non_field_errors|join:" " }}</small>{% endif %}
+</div>

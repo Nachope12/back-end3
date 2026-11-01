@@ -1,0 +1,7 @@
+{% extends "admin/change_list.html" %}
+{% block content %}
+{% if bajo_minimo %}
+<p class="alerta-stock"><b>{{ bajo_minimo }}</b> insumo{{ bajo_minimo|pluralize }} {{ bajo_minimo|pluralize:"está,están" }} en o bajo el stock mínimo. Revisa la columna «Estado».</p>
+{% endif %}
+{{ block.super }}
+{% endblock %}

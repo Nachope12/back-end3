@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block content %}
+<header class="cabecera">
+  <h1>{{ titulo }}</h1>
+  {% if puede_editar and url_create %}<a class="btn btn-primario" href="{% url url_create %}">Nuevo</a>{% endif %}
+</header>
+
+{% if buscar or filtro_opciones %}
+<form class="barra" method="get">
+  {% if buscar %}<input type="search" name="q" value="{{ q }}" placeholder="Buscar…" aria-label="Buscar">{% endif %}
+  {% if filtro_opciones %}
+  <select name="f" aria-label="Filtrar">
+    <option value="">Todos</option>
+    {% for valor, etiqueta in filtro_opciones %}<option value="{{ valor }}" {% if f == valor %}selected{% endif %}>{{ etiqueta }}</option>{% endfor %}
+  </select>
+  {% endif %}
+  <button class="btn btn-secundario">Filtrar</button>
+  {% if q or f %}<a class="btn-enlace" href="?">Limpiar</a>{% endif %}
+</form>
+{% endif %}
+
+{% if object_list %}
+<div class="tabla-wrap">
+<table class="tabla">
+  <thead><tr>{% for col in columns %}<th>{{ col.0 }}</th>{% endfor %}<th class="acciones-col"><span class="sr">Acciones</span></th></tr></thead>
+  <tbody>
+  {% for o in object_list %}
+    <tr>
+      {% for col in columns %}<td>{% cell o col %}</td>{% endfor %}
+      <td class="acciones">
+        {% if url_detail %}<a href="{% url url_detail o.pk %}">Ver</a>{% endif %}
+        {% if puede_editar and o|editable %}
+          {% if url_update %}<a href="{% url url_update o.pk %}">Editar</a>{% endif %}
+          {% if url_delete %}<a class="peligro" href="{% url url_delete o.pk %}">Eliminar</a>{% endif %}
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% if is_paginated %}
+<nav class="paginas" aria-label="Paginación">
+  {% if page_obj.has_previous %}<a href="?q={{ q|urlencode }}&f={{ f|urlencode }}&page={{ page_obj.previous_page_number }}">Anterior</a>{% endif %}
+  <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a href="?q={{ q|urlencode }}&f={{ f|urlencode }}&page={{ page_obj.next_page_number }}">Siguiente</a>{% endif %}
+</nav>
+{% endif %}
+{% else %}
+<section class="vacio">
+  <p>{% if q or f %}Ningún registro coincide con tu búsqueda.{% else %}Aún no hay registros en esta sección.{% endif %}</p>
+  {% if puede_editar and url_create and not q and not f %}<a class="btn btn-primario" href="{% url url_create %}">Crear el primero</a>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

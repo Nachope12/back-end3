@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Página no encontrada{% endblock %}
+{% block head %}{% if destino %}<meta http-equiv="refresh" content="{{ segundos|default:5 }};url={{ destino }}">{% endif %}{% endblock %}
+{% block content %}
+<section class="vacio">
+  <h1>No encontramos esta página</h1>
+  <p>La dirección no existe o ya no está disponible.</p>
+  {% if destino %}
+  <p>Te llevamos de vuelta en <b id="cuenta">{{ segundos|default:5 }}</b> segundos.</p>
+  <a class="btn btn-primario" href="{{ destino }}">Volver ahora</a>
+  <script>
+    (function () {
+      var n = {{ segundos|default:5 }}, el = document.getElementById('cuenta');
+      setInterval(function () { if (n > 1) { n -= 1; el.textContent = n; } }, 1000);
+    })();
+  </script>
+  {% else %}
+  <a class="btn btn-primario" href="{% url 'dashboard' %}">Volver al panel</a>
+  {% endif %}
+</section>
+{% endblock %}

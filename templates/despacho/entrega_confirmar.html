@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Confirmar entrega{% endblock %}
+{% block content %}
+<header class="cabecera"><h1>Confirmar entrega del pedido #{{ entrega.pedido.pk }}</h1></header>
+<p class="suave">{{ entrega.pedido.cliente }} · {{ entrega.pedido.direccion_entrega|default:"Sin dirección" }}</p>
+
+<form method="post" enctype="multipart/form-data" class="formulario" id="form-entrega" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="alerta alerta-error">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+  <div class="tarjeta">
+    <div class="campo"><label for="{{ form.receptor_nombre.id_for_label }}">{{ form.receptor_nombre.label }}</label>{{ form.receptor_nombre }}
+      {% for e in form.receptor_nombre.errors %}<small class="error">{{ e }}</small>{% endfor %}</div>
+
+    <div class="campo">
+      <label>Firma del receptor</label>
+      <canvas id="lienzo-firma" width="640" height="220" aria-label="Recuadro para firmar"></canvas>
+      <div class="botones"><button type="button" class="btn btn-secundario" id="limpiar-firma">Borrar firma</button></div>
+      {{ form.firma }}
+    </div>
+
+    <div class="campo"><label for="{{ form.foto.id_for_label }}">{{ form.foto.label }}</label>{{ form.foto }}
+      {% for e in form.foto.errors %}<small class="error">{{ e }}</small>{% endfor %}</div>
+  </div>
+  <div class="acciones-form">
+    <button class="btn btn-primario">Confirmar entrega</button>
+    <a class="btn btn-secundario" href="{% url 'ruta_detail' entrega.ruta_id %}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}
+{% block scripts %}{% load static %}<script src="{% static 'js/firma.js' %}"></script>{% endblock %}

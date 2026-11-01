@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Sin permiso{% endblock %}
+{% block content %}
+<section class="vacio">
+  <h1>No tienes permiso para ver esta página</h1>
+  <p>Tu rol no incluye esta sección. Si crees que es un error, pide acceso al administrador.</p>
+  <a class="btn btn-primario" href="{% url 'dashboard' %}">Volver al panel</a>
+</section>
+{% endblock %}

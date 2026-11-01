@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Ingresar{% endblock %}
+{% block content %}
+<section class="ingreso">
+  <h1>Dulce Arte</h1>
+  <p class="sub">Ingresa para gestionar pedidos, cocina y despachos.</p>
+  <form method="post" class="tarjeta">
+    {% csrf_token %}
+    {% if form.errors %}<div class="alerta alerta-error">Usuario o contraseña incorrectos.</div>{% endif %}
+    <label class="campo"><span>Usuario</span>{{ form.username }}</label>
+    <label class="campo"><span>Contraseña</span>{{ form.password }}</label>
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn btn-primario ancho">Ingresar</button>
+  </form>
+</section>
+{% endblock %}

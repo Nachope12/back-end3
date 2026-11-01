@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block title %}Panel{% endblock %}
+{% block content %}
+<header class="cabecera"><h1>Panel del taller</h1></header>
+
+{% if es_ventas or es_cocina %}
+<section class="estados" aria-label="Pedidos por etapa">
+  {% for nombre, cantidad, codigo in conteo_estados %}
+  <a class="estado-caja col-{{ codigo }}" href="{% url 'kanban' %}"><strong>{{ cantidad }}</strong><span>{{ nombre }}</span></a>
+  {% endfor %}
+</section>
+{% endif %}
+
+<div class="rejilla dos">
+  <section class="tarjeta">
+    <h2>Entregas de hoy</h2>
+    {% for p in entregas_hoy %}
+      <p class="fila-corta"><a href="{% url 'pedido_detail' p.pk %}">#{{ p.pk }} · {{ p.cliente }}</a>
+        <span>{{ p.fecha_entrega|time:"H:i" }} <span class="badge badge-{{ p.estado }}">{{ p.get_estado_display }}</span></span></p>
+    {% empty %}<p class="suave">No hay entregas programadas para hoy.</p>{% endfor %}
+  </section>
+
+  <section class="tarjeta">
+    <h2>Pedidos urgentes</h2>
+    <p class="suave">Entrega en menos de 6 horas y aún sin estar listos.</p>
+    {% for p in urgentes %}
+      <p class="fila-corta"><a href="{% url 'pedido_detail' p.pk %}">#{{ p.pk }} · {{ p.cliente }}</a>
+        <span>{{ p.fecha_entrega|date:"d/m H:i" }} <span class="badge badge-{{ p.estado }}">{{ p.get_estado_display }}</span></span></p>
+    {% empty %}<p class="suave">Nada urgente por ahora.</p>{% endfor %}
+  </section>
+
+  {% if es_ventas or es_cocina %}
+  <section class="tarjeta">
+    <h2>Insumos bajo el mínimo</h2>
+    {% for i in insumos_bajos %}
+      <p class="fila-corta"><span>{{ i.nombre }}</span><span><b>{{ i.stock|num }}</b> / {{ i.stock_minimo|num }} {{ i.unidad }}</span></p>
+    {% empty %}<p class="suave">Todo el inventario está sobre su mínimo.</p>{% endfor %}
+  </section>
+
+  <section class="tarjeta">
+    <h2>Insumos por vencer</h2>
+    {% for i in por_vencer %}
+      <p class="fila-corta"><span>{{ i.nombre }}</span><span>{{ i.fecha_vencimiento|date:"d/m/Y" }}</span></p>
+    {% empty %}<p class="suave">No hay insumos próximos a vencer.</p>{% endfor %}
+  </section>
+  {% endif %}
+</div>
+
+{% if es_reparto %}
+<p class="suave">Entregas pendientes en todas las rutas: <b>{{ entregas_pendientes }}</b></p>
+{% endif %}
+{% endblock %}

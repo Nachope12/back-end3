@@ -1,0 +1,8 @@
+{% extends "admin/base.html" %}
+{% load static %}
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | Dulce Arte{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'css/admin.css' %}">{% endblock %}
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">Dulce Arte · Administración</a></h1>
+{% endblock %}
+{% block nav-global %}<a class="volver-app" href="{% url 'dashboard' %}">← Ir a la aplicación</a>{% endblock %}

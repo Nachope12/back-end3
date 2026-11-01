@@ -1,0 +1,24 @@
+/* Personalización del Django Admin para Dulce Arte */
+:root {
+  --primary: #3b1d45;
+  --secondary: #54295f;
+  --accent: #c92a64;
+  --primary-fg: #fff;
+  --header-bg: #3b1d45;
+  --header-color: #f3ecf7;
+  --header-branding-color: #fff;
+  --breadcrumbs-bg: #54295f;
+  --breadcrumbs-link-fg: #f3d27a;
+  --link-fg: #a31f50;
+  --link-hover-color: #c92a64;
+  --button-bg: #c92a64;
+  --button-hover-bg: #a31f50;
+  --default-button-bg: #54295f;
+  --default-button-hover-bg: #3b1d45;
+  --object-tools-bg: #54295f;
+  --object-tools-hover-bg: #3b1d45;
+  --selected-row: #f6e9f0;
+}
+#site-name a { font-family: Georgia, "Palatino Linotype", serif; letter-spacing: .01em; }
+.volver-app { color: #f3d27a !important; margin-right: 1rem; }
+.alerta-stock { background: #fdf5dc; border: 1px solid #ecd791; border-radius: 8px; padding: .7rem 1rem; color: #5f4b0b; }

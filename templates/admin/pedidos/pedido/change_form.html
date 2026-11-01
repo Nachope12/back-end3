@@ -1,0 +1,18 @@
+{% extends "admin/change_form.html" %}
+{% block after_related_objects %}
+{{ block.super }}
+{% if requerimiento %}
+<fieldset class="module aligned">
+  <h2>Insumos necesarios según el BOM</h2>
+  <table style="width:100%">
+    <thead><tr><th>Insumo</th><th>Necesario</th><th>En bodega</th><th>Falta</th></tr></thead>
+    <tbody>
+    {% for f in requerimiento %}
+      <tr><td>{{ f.insumo.nombre }}</td><td>{{ f.necesario }} {{ f.insumo.unidad }}</td><td>{{ f.stock }} {{ f.insumo.unidad }}</td>
+        <td>{% if f.falta > 0 %}<b style="color:#b3261e">{{ f.falta }} {{ f.insumo.unidad }}</b>{% else %}—{% endif %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</fieldset>
+{% endif %}
+{% endblock %}

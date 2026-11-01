@@ -1,0 +1,47 @@
+{% load static %}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{% block title %}Panel{% endblock %} · Dulce Arte</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+<div class="app">
+  {% if user.is_authenticated %}
+  <aside class="lateral">
+    <a class="marca" href="{% url 'dashboard' %}">Dulce Arte<small>Taller y pedidos</small></a>
+    <nav>
+      <a href="{% url 'dashboard' %}" {% if request.path == '/' %}class="activo"{% endif %}>Panel</a>
+      {% if es_ventas %}<a href="{% url 'cotizacion_list' %}" {% if '/cotizacion' in request.path %}class="activo"{% endif %}>Cotizaciones</a>{% endif %}
+      {% if es_ventas or es_cocina or es_reparto %}<a href="{% url 'pedido_list' %}" {% if '/pedido' in request.path %}class="activo"{% endif %}>Pedidos</a>{% endif %}
+      {% if es_ventas or es_cocina %}<a href="{% url 'kanban' %}" {% if '/cocina' in request.path %}class="activo"{% endif %}>Tablero de cocina</a>{% endif %}
+      {% if es_ventas or es_reparto %}<a href="{% url 'ruta_list' %}" {% if '/ruta' in request.path or '/entrega' in request.path %}class="activo"{% endif %}>Rutas de despacho</a>{% endif %}
+      {% if es_ventas or es_cocina %}
+        <span class="grupo">Bodega</span>
+        <a href="{% url 'insumo_list' %}" {% if '/insumo' in request.path %}class="activo"{% endif %}>Insumos</a>
+        <a href="{% url 'producto_list' %}" {% if '/producto' in request.path %}class="activo"{% endif %}>Productos y BOM</a>
+        <a href="{% url 'movimiento_list' %}" {% if '/movimiento' in request.path %}class="activo"{% endif %}>Movimientos</a>
+      {% endif %}
+      {% if es_ventas %}<span class="grupo">Clientes</span>
+        <a href="{% url 'cliente_list' %}" {% if '/cliente' in request.path %}class="activo"{% endif %}>Clientes</a>{% endif %}
+      {% if user.is_staff %}<span class="grupo">Sistema</span><a href="{% url 'admin:index' %}">Administración Django</a>{% endif %}
+    </nav>
+    <div class="usuario">
+      <span>{{ user.get_full_name|default:user.username }}</span>
+      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="btn-enlace">Cerrar sesión</button></form>
+    </div>
+  </aside>
+  {% endif %}
+  <main class="contenido">
+    {% for m in messages %}<div class="alerta alerta-{{ m.level_tag }}" role="status">{{ m }}</div>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+<div id="aviso" class="aviso" role="alert" hidden></div>
+<script src="{% static 'js/app.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

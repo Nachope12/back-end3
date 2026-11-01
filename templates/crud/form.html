@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block content %}
+<header class="cabecera"><h1>{{ titulo }}</h1></header>
+<form method="post" class="formulario" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="alerta alerta-error">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+  <div class="tarjeta rejilla-campos">
+    {% for campo in form %}{% include "crud/_campo.html" %}{% endfor %}
+  </div>
+
+  {% if formset %}
+  <section class="tarjeta" data-formset="{{ formset.prefix }}">
+    <h2>Detalle</h2>
+    {{ formset.management_form }}
+    {% if formset.non_form_errors %}<div class="alerta alerta-error">{{ formset.non_form_errors|join:" " }}</div>{% endif %}
+    <div class="lineas">
+      {% for f in formset %}{% include "crud/_linea.html" %}{% endfor %}
+    </div>
+    <template>{% with f=formset.empty_form %}{% include "crud/_linea.html" %}{% endwith %}</template>
+    <button type="button" class="btn btn-secundario agregar-linea">Agregar línea</button>
+  </section>
+  {% endif %}
+
+  <div class="acciones-form">
+    <button class="btn btn-primario">Guardar</button>
+    <a class="btn btn-secundario" href="{{ url_lista }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

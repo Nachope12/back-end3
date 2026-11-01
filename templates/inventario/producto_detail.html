@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load core_extras %}
+{% block title %}{{ object.nombre }}{% endblock %}
+{% block content %}
+<header class="cabecera">
+  <h1>{{ object.nombre }}</h1>
+  <div class="botones">
+    {% if es_cocina %}<a class="btn btn-secundario" href="{% url 'producto_update' object.pk %}">Editar</a>{% endif %}
+    <a class="btn btn-secundario" href="{% url 'producto_list' %}">Volver</a>
+  </div>
+</header>
+<div class="rejilla dos">
+  <section class="tarjeta">
+    <h2>Ficha</h2>
+    <dl class="datos">
+      <dt>Descripción</dt><dd>{{ object.descripcion|default:"—"|linebreaksbr }}</dd>
+      <dt>Porciones</dt><dd>{{ object.porciones }}</dd>
+      <dt>Preparación</dt><dd>{{ object.tiempo_preparacion_min }} min</dd>
+      <dt>Costo de insumos</dt><dd>{{ object.costo_insumos|clp }}</dd>
+      <dt>Mano de obra</dt><dd>{{ object.mano_obra|clp }}</dd>
+      <dt>Margen</dt><dd>{{ object.margen_pct|num }} %</dd>
+      <dt>Precio sugerido</dt><dd><b>{{ object.precio_sugerido|clp }}</b></dd>
+    </dl>
+  </section>
+  <section class="tarjeta">
+    <h2>Lista de materiales (BOM)</h2>
+    <p class="suave">Insumos que se descuentan por cada unidad de este producto.</p>
+    <table class="tabla compacta">
+      <thead><tr><th>Insumo</th><th>Cantidad</th><th>Stock actual</th></tr></thead>
+      <tbody>{% for it in object.bom.all %}<tr><td>{{ it.insumo.nombre }}</td><td>{{ it.cantidad|num }} {{ it.insumo.unidad }}</td><td>{{ it.insumo.stock|num }} {{ it.insumo.unidad }}</td></tr>{% endfor %}</tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

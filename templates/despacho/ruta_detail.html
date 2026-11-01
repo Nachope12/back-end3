@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ object.nombre }}{% endblock %}
+{% block content %}
+<header class="cabecera">
+  <h1>{{ object.nombre }} <span class="badge badge-{{ object.estado }}">{{ object.get_estado_display }}</span></h1>
+  <div class="botones">
+    {% if object.estado == "PLANIFICADA" %}
+    <form method="post" action="{% url 'ruta_iniciar' object.pk %}">{% csrf_token %}<button class="btn btn-primario">Iniciar ruta</button></form>
+    {% endif %}
+    {% if puede_planificar %}<a class="btn btn-secundario" href="{% url 'ruta_update' object.pk %}">Editar</a>{% endif %}
+    <a class="btn btn-secundario" href="{% url 'ruta_list' %}">Volver</a>
+  </div>
+</header>
+<p class="suave">{{ object.fecha|date:"l d/m/Y" }} · Repartidor: {{ object.repartidor|default:"sin asignar" }} · {{ object.resumen }}</p>
+
+<section class="tarjeta">
+  <h2>Entregas</h2>
+  {% for e in entregas %}
+  <article class="entrega-fila">
+    <div>
+      <b>{{ e.orden }}. <a href="{% url 'pedido_detail' e.pedido.pk %}">Pedido #{{ e.pedido.pk }} · {{ e.pedido.cliente }}</a></b>
+      <p class="suave">{{ e.pedido.direccion_entrega|default:"Sin dirección" }} · {{ e.pedido.fecha_entrega|date:"d/m H:i" }}</p>
+      {% if e.estado == "ENTREGADA" %}
+        <p>Recibió <b>{{ e.receptor_nombre }}</b> el {{ e.entregada_en|date:"d/m/Y H:i" }}.
+          {% if e.firma %}<a href="{{ e.firma.url }}" target="_blank" rel="noopener">Ver firma</a>{% endif %}
+          {% if e.foto %}<a href="{{ e.foto.url }}" target="_blank" rel="noopener">Ver foto</a>{% endif %}</p>
+      {% elif e.estado == "FALLIDA" %}<p class="suave">Motivo: {{ e.observaciones }}</p>{% endif %}
+    </div>
+    <div class="botones">
+      <span class="badge badge-{{ e.estado }}">{{ e.get_estado_display }}</span>
+      {% if puede_entregar and e.estado == "PENDIENTE" %}
+        <a class="btn btn-primario" href="{% url 'entrega_confirmar' e.pk %}">Confirmar entrega</a>
+        <form method="post" action="{% url 'entrega_fallida' e.pk %}" data-pedir-motivo="Motivo de la entrega fallida">{% csrf_token %}
+          <input type="hidden" name="motivo"><button class="btn btn-secundario">No se pudo entregar</button></form>
+      {% endif %}
+    </div>
+  </article>
+  {% empty %}<p class="suave">Esta ruta aún no tiene pedidos asignados.</p>{% endfor %}
+</section>
+
+{% if puede_planificar %}
+<section class="tarjeta">
+  <h2>Agregar pedido listo</h2>
+  <form method="post" action="{% url 'ruta_agregar' object.pk %}" class="barra">{% csrf_token %}
+    {{ form_agregar.pedido }}
+    <button class="btn btn-primario">Agregar a la ruta</button>
+  </form>
+</section>
+{% endif %}
+{% endblock %}
